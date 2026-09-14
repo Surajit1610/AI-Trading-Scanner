@@ -1,0 +1,89 @@
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    networks:
+      - scanner-network
+    restart: unless-stopped
+
+  mongo:
+    image: mongo:7.0
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME:-root}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD:-example}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - scanner-network
+    restart: unless-stopped
+
+  fastapi-ai:
+    build:
+      context: ./ai-service
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      -  GEMINI_API_KEY=${GEMINI_API_KEY}
+    networks:
+      - scanner-network
+    restart: unless-stopped
+    depends_on:
+      - redis
+      - mongo
+
+  backend-node:
+    build:
+      context: ./backend-core
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      - PORT=5000
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - MONGO_USERNAME=${MONGO_INITDB_ROOT_USERNAME:-root}
+      - MONGO_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD:-example}
+      - AI_SERVICE_URL=http://fastapi-ai:8000
+      - RESEND_API_KEY=${RESEND_API_KEY}
+      - FRONTEND_URL=${FRONTEND_URL:-http://localhost:3000}
+      - BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}
+      - BETTER_AUTH_URL=${BETTER_AUTH_URL:-http://localhost:3000}
+      - ONESIGNAL_APP_ID=${ONESIGNAL_APP_ID}
+      - ONESIGNAL_REST_API_KEY=${ONESIGNAL_REST_API_KEY}
+    networks:
+      - scanner-network
+    restart: unless-stopped
+    depends_on:
+      - redis
+      - mongo
+      - fastapi-ai
+
+  frontend-next:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:5000}
+      - BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}
+      - BETTER_AUTH_URL=${BETTER_AUTH_URL:-http://localhost:3000}
+      - NEXT_PUBLIC_ONESIGNAL_APP_ID=${NEXT_PUBLIC_ONESIGNAL_APP_ID}
+      - MONGO_USERNAME=${MONGO_INITDB_ROOT_USERNAME:-root}
+      - MONGO_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD:-example}
+    networks:
+      - scanner-network
+    restart: unless-stopped
+    depends_on:
+      - backend-node
+
+networks:
+  scanner-network:
+    driver: bridge
+
+volumes:
+  mongo_data:
