@@ -9,8 +9,16 @@ export default function Dashboard() {
   const [message, setMessage] = useState('');
   const [broker, setBroker] = useState('Sahi');
 
+  const [activeTab, setActiveTab] = useState<'ai_alert' | 'math_pass'>('ai_alert');
+
   useEffect(() => {
     getProfile().then(p => setBroker(p.preferredBroker)).catch(console.error);
+    
+    // Allow URL param to set initial tab
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('tab') === 'math') setActiveTab('math_pass');
+    }
   }, []);
 
   const handleTestScan = async () => {
@@ -18,7 +26,7 @@ export default function Dashboard() {
     setMessage('');
     try {
       await triggerImmediateScan();
-      setMessage('Scan triggered successfully! Wait a few seconds for AI evaluation.');
+      setMessage('Scan triggered successfully! Wait a few seconds for evaluation.');
     } catch (err: any) {
       setMessage('Error triggering scan: ' + err.message);
     }
@@ -48,8 +56,30 @@ export default function Dashboard() {
       )}
 
       <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-        <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200 border-b dark:border-gray-700 pb-4 mb-4">Recent Alerts</h2>
-        <SignalList broker={broker} />
+        <div className="flex space-x-6 border-b dark:border-gray-700 mb-6">
+          <button
+            onClick={() => setActiveTab('ai_alert')}
+            className={`pb-4 text-sm font-semibold transition-colors ${
+              activeTab === 'ai_alert'
+                ? 'text-blue-600 border-b-2 border-blue-600 dark:text-blue-400 dark:border-blue-400'
+                : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
+            }`}
+          >
+            AI Alerts (Score &ge; 80)
+          </button>
+          <button
+            onClick={() => setActiveTab('math_pass')}
+            className={`pb-4 text-sm font-semibold transition-colors ${
+              activeTab === 'math_pass'
+                ? 'text-blue-600 border-b-2 border-blue-600 dark:text-blue-400 dark:border-blue-400'
+                : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
+            }`}
+          >
+            Math Passes (Last 24h)
+          </button>
+        </div>
+        
+        <SignalList broker={broker} level={activeTab} />
       </div>
     </div>
   );

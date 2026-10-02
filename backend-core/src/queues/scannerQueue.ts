@@ -15,7 +15,7 @@ export const scannerQueue = new Queue('market-scanner-queue', { connection });
 export async function addAlarmJob(alarmId: string, userId: string, cron: string) {
   await scannerQueue.upsertJobScheduler(
     `alarm-${alarmId}`,
-    { pattern: cron },
+    { pattern: cron, tz: 'Asia/Kolkata' },
     {
       name: 'scan-alarm',
       data: { alarmId, userId },

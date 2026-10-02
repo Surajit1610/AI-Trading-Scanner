@@ -1,9 +1,11 @@
 import { Router } from 'express';
 import AssetCatalog from '../models/AssetCatalog.js';
 import { requireAuth } from '../middleware/requireAuth.js';
+import { searchAssets } from '../services/marketData.js';
 
 const router = Router();
 
+// Keep for backwards compatibility / default list
 router.get('/assets', requireAuth, async (req, res) => {
   try {
     let assets = await AssetCatalog.find({ isActive: true });
@@ -30,6 +32,19 @@ router.get('/assets', requireAuth, async (req, res) => {
   } catch (error) {
     console.error('Error fetching assets:', error);
     res.status(500).json({ error: 'Failed to fetch assets' });
+  }
+});
+
+// Live global search via Yahoo Finance
+router.get('/assets/search', requireAuth, async (req, res) => {
+  try {
+    const query = req.query.q as string;
+    if (!query) return res.status(200).json([]);
+    const results = await searchAssets(query);
+    res.status(200).json(results);
+  } catch (error) {
+    console.error('Error searching live assets:', error);
+    res.status(500).json({ error: 'Failed to search assets' });
   }
 });
 

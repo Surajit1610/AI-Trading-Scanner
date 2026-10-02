@@ -49,6 +49,7 @@ services:
       - MONGO_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD:-example}
       - AI_SERVICE_URL=http://fastapi-ai:8000
       - RESEND_API_KEY=${RESEND_API_KEY}
+      - EMAIL_FROM_ALERTS=${EMAIL_FROM_ALERTS}
       - FRONTEND_URL=${FRONTEND_URL:-http://localhost:3000}
       - BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}
       - BETTER_AUTH_URL=${BETTER_AUTH_URL:-http://localhost:3000}
@@ -75,6 +76,8 @@ services:
       - NEXT_PUBLIC_ONESIGNAL_APP_ID=${NEXT_PUBLIC_ONESIGNAL_APP_ID}
       - MONGO_USERNAME=${MONGO_INITDB_ROOT_USERNAME:-root}
       - MONGO_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD:-example}
+      - RESEND_API_KEY=${RESEND_API_KEY}
+      - EMAIL_FROM_ONBOARDING=${EMAIL_FROM_ONBOARDING}
     networks:
       - scanner-network
     restart: unless-stopped

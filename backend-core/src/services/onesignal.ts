@@ -1,7 +1,7 @@
 const ONE_SIGNAL_APP_ID = process.env.ONESIGNAL_APP_ID || '';
 const ONE_SIGNAL_API_KEY = process.env.ONESIGNAL_REST_API_KEY || '';
 
-export async function sendPushNotification(userId: string, ticker: string, score: number, timeframe: string, broker: string) {
+async function sendOneSignalPush(userId: string, heading: string, content: string, url: string) {
   if (!ONE_SIGNAL_APP_ID || !ONE_SIGNAL_API_KEY) {
     console.warn('[OneSignal] Missing credentials. Skipping push notification.');
     return;
@@ -9,19 +9,11 @@ export async function sendPushNotification(userId: string, ticker: string, score
 
   const payload = {
     app_id: ONE_SIGNAL_APP_ID,
-    // Target the specific user ID securely linked during login on the frontend
-    include_aliases: {
-      external_id: [userId]
-    },
-    target_channel: "push",
-    headings: {
-      en: `🟢 AI Alert: BUY ${ticker}`
-    },
-    contents: {
-      en: `Score: ${score}/100 [${timeframe}]. Tap to view rationale and execute trade on ${broker || 'Sahi'}.`
-    },
-    // When the user taps the push notification, route them to their dashboard
-    url: process.env.FRONTEND_URL || "http://localhost:3000"
+    include_aliases: { external_id: [userId] },
+    target_channel: 'push',
+    headings: { en: heading },
+    contents: { en: content },
+    url,
   };
 
   try {
@@ -29,18 +21,40 @@ export async function sendPushNotification(userId: string, ticker: string, score
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Basic ${ONE_SIGNAL_API_KEY}`
+        'Authorization': `Key ${ONE_SIGNAL_API_KEY.replace(/['"]/g, '').trim()}`
       },
       body: JSON.stringify(payload)
     });
 
     if (!response.ok) {
-      const errorData = await response.text();
-      console.error('[OneSignal] Failed to send push:', response.status, errorData);
+      const err = await response.text();
+      console.error('[OneSignal] Failed to send push:', response.status, err);
     } else {
-      console.log(`[OneSignal] Push sent successfully for ${ticker} to user ${userId}`);
+      console.log(`[OneSignal] Push sent to user ${userId}: ${heading}`);
     }
   } catch (error) {
     console.error('[OneSignal] Network error:', error);
   }
+}
+
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
+
+/** Level 1 — fires when a stock passes the math filter */
+export async function sendMathPassNotification(userId: string, ticker: string, timeframe: string, passedCount: number) {
+  await sendOneSignalPush(
+    userId,
+    `⚡ ${ticker} passed ${passedCount} filter${passedCount !== 1 ? 's' : ''} [${timeframe}]`,
+    `${ticker} cleared your math indicators. AI evaluation in progress...`,
+    `${FRONTEND_URL}/?tab=math`
+  );
+}
+
+/** Level 2 — fires when AI confirms a high-scoring setup (score >= 80) */
+export async function sendPushNotification(userId: string, ticker: string, score: number, timeframe: string, broker: string) {
+  await sendOneSignalPush(
+    userId,
+    `🟢 AI ALERT: BUY ${ticker}`,
+    `Score: ${score}/100 [${timeframe}]. Tap to view rationale and execute on ${broker || 'your broker'}.`,
+    `${FRONTEND_URL}/?tab=alerts`
+  );
 }

@@ -5,12 +5,34 @@ export interface ToolsConfig {
   ema_cross: { enabled: boolean; fast_period: number; slow_period: number };
   volume_spike: { enabled: boolean; multiplier: number };
   support_resistance: { enabled: boolean; window: number };
+  fundamentals: { enabled: boolean; min_volume: number; min_market_cap: number; min_change_pct: number; max_change_pct: number };
+  stochastic: { enabled: boolean; oversold_threshold: number };
+  williams_r: { enabled: boolean; oversold_threshold: number };
+  bollinger_bands: { enabled: boolean; tolerance_pct: number };
+  vwap: { enabled: boolean; require_above: boolean };
+  macd: { enabled: boolean; require_positive_hist: boolean; fast: number; slow: number; signal: number };
+  ichimoku: { enabled: boolean; condition: 'above_cloud' | 'below_cloud' };
+  rsi: { enabled: boolean; period: number; condition: 'oversold' | 'overbought'; threshold: number };
+  open_interest: { enabled: boolean; condition: 'highest' | 'highest_change' };
+}
+
+export interface Strategy {
+  id: string;
+  name: string;
+  isActive: boolean;
+  useAI: boolean;
+  indicators: ToolsConfig;
 }
 
 export interface UserProfileData {
   userId?: string;
   savedTickers: string[];
-  savedIndicators: ToolsConfig;
+  strategies: Strategy[];
+  autoScan: {
+    stocks: { gainers: boolean; losers: boolean };
+    crypto: { gainers: boolean; losers: boolean };
+    forex: { gainers: boolean; losers: boolean };
+  };
   preferredTimeframe: string;
   preferredBroker: string;
   notificationEmail: string;
@@ -36,9 +58,11 @@ export interface AlertSignal {
   userId: string;
   ticker: string;
   timeframe: string;
-  score: number;
-  verdict: string;
-  rationale: string;
+  strategyName?: string;
+  level: 'math_pass' | 'ai_alert';
+  score: number | null;
+  verdict: string | null;
+  rationale: string | null;
   activeIndicators: Record<string, any>;
   createdAt: string;
 }
@@ -46,6 +70,13 @@ export interface AlertSignal {
 export async function getAssets(): Promise<Asset[]> {
   const res = await fetch(`${API_URL}/api/assets`, { next: { revalidate: 0 }, credentials: 'include' });
   if (!res.ok) throw new Error('Failed to fetch assets');
+  return res.json();
+}
+
+export async function searchAssetsAPI(query: string): Promise<Asset[]> {
+  if (!query) return [];
+  const res = await fetch(`${API_URL}/api/assets/search?q=${encodeURIComponent(query)}`, { next: { revalidate: 0 }, credentials: 'include' });
+  if (!res.ok) throw new Error('Failed to search live assets');
   return res.json();
 }
 
@@ -111,8 +142,9 @@ export async function deleteAlarm(id: string): Promise<void> {
   if (!res.ok) throw new Error('Failed to delete alarm');
 }
 
-export async function getSignals(): Promise<AlertSignal[]> {
-  const res = await fetch(`${API_URL}/api/signals`, { next: { revalidate: 0 }, credentials: 'include' });
+export async function getSignals(level?: 'math_pass' | 'ai_alert'): Promise<AlertSignal[]> {
+  const url = level ? `${API_URL}/api/signals?level=${level}` : `${API_URL}/api/signals`;
+  const res = await fetch(url, { next: { revalidate: 0 }, credentials: 'include' });
   if (!res.ok) throw new Error('Failed to fetch signals');
   return res.json();
 }

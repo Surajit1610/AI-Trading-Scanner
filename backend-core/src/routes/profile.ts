@@ -27,11 +27,11 @@ router.get('/profile', requireAuth, async (req, res) => {
 router.put('/profile', requireAuth, async (req, res) => {
   try {
     const userId = req.user!.id;
-    const { savedTickers, savedIndicators, preferredTimeframe, preferredBroker, notificationEmail } = req.body;
+    const { savedTickers, strategies, preferredTimeframe, preferredBroker, notificationEmail, autoScan } = req.body;
     
     const profile = await UserProfile.findOneAndUpdate(
       { userId },
-      { savedTickers, savedIndicators, preferredTimeframe, preferredBroker, notificationEmail },
+      { savedTickers, strategies, preferredTimeframe, preferredBroker, notificationEmail, autoScan },
       { new: true, upsert: true }
     );
     

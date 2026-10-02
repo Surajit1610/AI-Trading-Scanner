@@ -19,11 +19,11 @@ def analyze_ticker(request: AnalyzeRequest):
             raise HTTPException(status_code=400, detail="Candles array cannot be empty")
             
         # Stage 1: Math Filter
-        passed_math, indicator_details = calculate_indicators(request.candles, request.tools)
+        passed_math, indicator_details = calculate_indicators(request.candles, request.tools, request.quote)
         
         ai_eval = None
-        # Stage 2: AI Evaluation (only if math filter passes)
-        if passed_math:
+        # Stage 2: AI Evaluation (only if math filter passes and AI is enabled)
+        if passed_math and request.use_ai:
             ai_eval = evaluate_with_llm(
                 ticker=request.ticker,
                 timeframe=request.timeframe,

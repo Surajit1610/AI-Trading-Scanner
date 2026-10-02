@@ -5,13 +5,13 @@ import { getSignals } from '@/lib/api';
 import type { AlertSignal } from '@/lib/api';
 import SignalCard from './SignalCard';
 
-export default function SignalList({ broker = 'Sahi' }: { broker?: string }) {
+export default function SignalList({ broker = 'Sahi', level }: { broker?: string, level?: 'math_pass' | 'ai_alert' }) {
   const [signals, setSignals] = useState<AlertSignal[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchSignals = async () => {
     try {
-      const data = await getSignals();
+      const data = await getSignals(level);
       setSignals(data);
     } catch (error) {
       console.error(error);
@@ -24,7 +24,7 @@ export default function SignalList({ broker = 'Sahi' }: { broker?: string }) {
     fetchSignals();
     const interval = setInterval(fetchSignals, 15000); // refresh every 15s
     return () => clearInterval(interval);
-  }, []);
+  }, [level]);
 
   const exportToCsv = () => {
     if (signals.length === 0) return;
@@ -34,13 +34,14 @@ export default function SignalList({ broker = 'Sahi' }: { broker?: string }) {
     
     // Map data
     const csvRows = signals.map(s => {
+      const safeRationale = s.rationale ? s.rationale.replace(/"/g, '""') : '';
       return [
         new Date(s.createdAt).toISOString(),
         s.ticker,
         s.timeframe,
-        s.verdict,
-        s.score,
-        `"${s.rationale.replace(/"/g, '""')}"` // Escape quotes for CSV
+        s.verdict || 'MATH_PASS',
+        s.score !== null ? s.score : 'N/A',
+        `"${safeRationale}"` // Escape quotes for CSV
       ].join(',');
     });
     
