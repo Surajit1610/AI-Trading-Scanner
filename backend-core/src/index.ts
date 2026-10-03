@@ -16,7 +16,9 @@ const app = express();
 const port = process.env.PORT || 5000;
 const mongoUri = buildMongoUri(process.env);
 
-app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
+// Allow CORS for the frontend (Dynamic for Production)
+const allowedOrigin = process.env.FRONTEND_PUBLIC_URL || 'http://localhost:3000';
+app.use(cors({ origin: allowedOrigin, credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
 

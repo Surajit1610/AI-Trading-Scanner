@@ -1,0 +1,77 @@
+services:
+  redis:
+    image: redis:7-alpine
+    restart: always
+    ports:
+      - "127.0.0.1:6379:6379" # Bound to localhost for SSH Tunnel access only
+    volumes:
+      - redis_data:/data
+    networks:
+      - scanner-network
+
+  mongo:
+    image: mongo:7.0
+    restart: always
+    ports:
+      - "127.0.0.1:27017:27017" # Bound to localhost for SSH Tunnel access only
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - scanner-network
+
+  fastapi-ai:
+    build:
+      context: ./ai-service
+    restart: always
+    environment:
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+    networks:
+      - scanner-network
+
+  backend-node:
+    build:
+      context: ./backend-core
+    restart: always
+    environment:
+      - PORT=5000
+      - MONGO_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+      - MONGO_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - FRONTEND_INTERNAL_URL=http://frontend-next:3000
+      - FRONTEND_PUBLIC_URL=${FRONTEND_PUBLIC_URL}
+      - RESEND_API_KEY=${RESEND_API_KEY}
+    ports:
+      - "127.0.0.1:5000:5000" # Only accessible to local Nginx
+    depends_on:
+      - mongo
+      - redis
+      - fastapi-ai
+    networks:
+      - scanner-network
+
+  frontend-next:
+    build:
+      context: ./frontend
+    restart: always
+    environment:
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+      - BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}
+      - BETTER_AUTH_URL=${BETTER_AUTH_URL}
+    ports:
+      - "127.0.0.1:3000:3000" # Only accessible to local Nginx
+    depends_on:
+      - backend-node
+    networks:
+      - scanner-network
+
+volumes:
+  redis_data:
+  mongo_data:
+
+networks:
+  scanner-network:
+    driver: bridge
