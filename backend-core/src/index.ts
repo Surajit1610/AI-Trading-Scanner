@@ -16,9 +16,18 @@ const app = express();
 const port = process.env.PORT || 5000;
 const mongoUri = buildMongoUri(process.env);
 
-// Allow CORS for the frontend (Dynamic for Production)
-const allowedOrigin = process.env.FRONTEND_PUBLIC_URL || process.env.NEXT_PUBLIC_FRONTEND_URL || 'http://localhost:3000';
-app.use(cors({ origin: allowedOrigin, credentials: true }));
+// Allow CORS for the frontend robustly
+app.use(cors({ 
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+    if (origin.includes('localhost') || origin.includes('aitrader.save-more.in')) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true 
+}));
 app.use(express.json());
 app.use(cookieParser());
 
