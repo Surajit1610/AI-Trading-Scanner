@@ -242,29 +242,21 @@ export async function sendScanSummaryEmail(
   const mathPassesHtml = `
     <div>
       <h3 style="color: #8b5cf6; border-bottom: 2px solid #8b5cf6; padding-bottom: 5px;">⚡ Math Filter Passes (${mathPasses.length})</h3>
-      <p style="font-size: 13px; color: #6b7280; margin-top: 0;">These stocks passed your mathematical indicators.</p>
-      <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
-        <thead>
-          <tr style="background-color: #f3f4f6;">
-            <th style="padding: 10px; text-align: left; border: 1px solid #e5e7eb;">Ticker</th>
-            <th style="padding: 10px; text-align: left; border: 1px solid #e5e7eb;">Strategy</th>
-            <th style="padding: 10px; text-align: left; border: 1px solid #e5e7eb;">Timeframe</th>
-            <th style="padding: 10px; text-align: center; border: 1px solid #e5e7eb;">Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${mathPasses.map(p => `
-            <tr>
-              <td style="padding: 10px; border: 1px solid #e5e7eb; font-weight: bold;">${p.ticker}</td>
-              <td style="padding: 10px; border: 1px solid #e5e7eb;">${p.strategyName}</td>
-              <td style="padding: 10px; border: 1px solid #e5e7eb;">${p.timeframe}</td>
-              <td style="padding: 10px; border: 1px solid #e5e7eb; text-align: center;">
-                <a href="${getBrokerUrl(p.broker, p.ticker)}" style="display: inline-block; padding: 6px 12px; background-color: #2563eb; color: white; text-decoration: none; font-size: 12px; border-radius: 4px;">Trade</a>
-              </td>
-            </tr>
-          `).join('')}
-        </tbody>
-      </table>
+      <p style="font-size: 13px; color: #6b7280; margin-top: 0; margin-bottom: 15px;">These stocks passed your mathematical indicators.</p>
+      
+      <div style="display: block;">
+        ${mathPasses.map(p => `
+          <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 12px; margin-bottom: 10px;">
+            <div style="display: block; margin-bottom: 8px;">
+              <h4 style="margin: 0 0 5px 0; font-size: 16px; color: #1e293b;">${p.ticker} <span style="font-size: 13px; color: #64748b; font-weight: normal;">(${p.timeframe})</span></h4>
+              <p style="margin: 0; font-size: 13px; color: #475569;"><strong>Strategy:</strong> ${p.strategyName}</p>
+            </div>
+            <div style="margin-top: 10px;">
+              <a href="${getBrokerUrl(p.broker, p.ticker)}" style="display: inline-block; padding: 8px 16px; background-color: #2563eb; color: white; text-decoration: none; font-size: 13px; font-weight: bold; border-radius: 4px; text-align: center;">Execute Trade</a>
+            </div>
+          </div>
+        `).join('')}
+      </div>
     </div>
   `;
 
