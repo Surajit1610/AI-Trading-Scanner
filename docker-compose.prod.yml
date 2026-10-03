@@ -46,6 +46,8 @@ services:
       - FRONTEND_PUBLIC_URL=${FRONTEND_PUBLIC_URL}
       - NEXT_PUBLIC_FRONTEND_URL=${NEXT_PUBLIC_FRONTEND_URL}
       - RESEND_API_KEY=${RESEND_API_KEY}
+      - ONESIGNAL_APP_ID=${ONESIGNAL_APP_ID}
+      - ONESIGNAL_REST_API_KEY=${ONESIGNAL_REST_API_KEY}
     ports:
       - "127.0.0.1:5000:5000" # Only accessible to local Nginx
     depends_on:
@@ -61,6 +63,7 @@ services:
       args:
         - NEXT_PUBLIC_FRONTEND_URL=${FRONTEND_PUBLIC_URL}
         - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+        - NEXT_PUBLIC_ONESIGNAL_APP_ID=${NEXT_PUBLIC_ONESIGNAL_APP_ID}
     restart: always
     environment:
       - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
@@ -69,6 +72,7 @@ services:
       - MONGO_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
       - MONGO_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
       - RESEND_API_KEY=${RESEND_API_KEY}
+      - NEXT_PUBLIC_ONESIGNAL_APP_ID=${NEXT_PUBLIC_ONESIGNAL_APP_ID}
     ports:
       - "127.0.0.1:3000:3000" # Only accessible to local Nginx
     depends_on:
