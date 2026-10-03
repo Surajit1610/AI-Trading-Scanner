@@ -77,7 +77,7 @@ export const auth = betterAuth({
     },
     advanced: {
         defaultCookieAttributes: {
-            domain: "aitrader.save-more.in",
+            domain: process.env.BETTER_AUTH_URL ? new URL(process.env.BETTER_AUTH_URL).hostname : undefined,
             secure: true,
             sameSite: "none"
         }
