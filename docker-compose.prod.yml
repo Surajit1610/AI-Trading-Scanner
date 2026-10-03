@@ -64,6 +64,9 @@ services:
       - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
       - BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}
       - BETTER_AUTH_URL=${BETTER_AUTH_URL}
+      - MONGO_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+      - MONGO_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+      - RESEND_API_KEY=${RESEND_API_KEY}
     ports:
       - "127.0.0.1:3000:3000" # Only accessible to local Nginx
     depends_on:
