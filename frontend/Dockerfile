@@ -18,6 +18,14 @@ COPY . .
 # Next.js telemetry is disabled by default via build-time var, but let's be explicit
 ENV NEXT_TELEMETRY_DISABLED 1
 
+# Accept build arguments for Next.js public variables
+ARG NEXT_PUBLIC_FRONTEND_URL
+ARG NEXT_PUBLIC_API_URL
+
+# Expose them as environment variables during the build step
+ENV NEXT_PUBLIC_FRONTEND_URL=$NEXT_PUBLIC_FRONTEND_URL
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+
 RUN npm run build
 
 # Production image, copy all the files and run next
