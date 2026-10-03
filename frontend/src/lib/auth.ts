@@ -12,7 +12,7 @@ const client = new MongoClient(mongoUrl);
 const resend = new Resend(process.env.RESEND_API_KEY || "re_mock_key");
 
 export const auth = betterAuth({
-    database: mongodbAdapter(client.db()),
+    database: mongodbAdapter(client.db("trading_db")),
     user: {
         additionalFields: {
             role: {
