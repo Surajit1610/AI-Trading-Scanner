@@ -6,6 +6,7 @@ import profileRoutes from './routes/profile.js';
 import alarmRoutes from './routes/alarms.js';
 import signalRoutes from './routes/signals.js';
 import assetRoutes from './routes/assets.js';
+import adminRoutes from './routes/admin.js';
 import { buildMongoUri } from './config/mongoUri.js';
 
 // Import the worker so it starts listening on boot
@@ -24,6 +25,7 @@ app.use('/api', profileRoutes);
 app.use('/api', alarmRoutes);
 app.use('/api', signalRoutes);
 app.use('/api', assetRoutes);
+app.use('/api', adminRoutes);
 
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok', service: 'backend-core' });

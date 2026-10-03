@@ -19,11 +19,15 @@ export default function Navbar() {
     router.push('/login');
   };
 
-  const navLinks = [
+  const navLinks = session ? [
     { name: 'Dashboard', href: '/' },
     { name: 'My Profile', href: '/profile' },
     { name: 'Alarms', href: '/alarms' },
-  ];
+  ] : [];
+
+  if (session && (session.user as any).role === 'admin') {
+    navLinks.push({ name: 'Admin Panel', href: '/admin' });
+  }
 
   return (
     <nav className="bg-gray-900 text-white shadow-md">
@@ -34,23 +38,25 @@ export default function Navbar() {
               <Link href="/">AI TRADER</Link>
             </div>
             {/* Desktop Menu */}
-            <div className="hidden md:block">
-              <div className="flex items-baseline space-x-4">
-                {navLinks.map((link) => (
-                  <Link
-                    key={link.name}
-                    href={link.href}
-                    className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                      pathname === link.href
-                        ? 'bg-gray-800 text-white'
-                        : 'text-gray-300 hover:bg-gray-700 hover:text-white'
-                    }`}
-                  >
-                    {link.name}
-                  </Link>
-                ))}
+            {session && (
+              <div className="hidden md:block">
+                <div className="flex items-baseline space-x-4">
+                  {navLinks.map((link) => (
+                    <Link
+                      key={link.name}
+                      href={link.href}
+                      className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                        pathname === link.href
+                          ? 'bg-gray-800 text-white'
+                          : 'text-gray-300 hover:bg-gray-700 hover:text-white'
+                      }`}
+                    >
+                      {link.name}
+                    </Link>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
           </div>
           <div className="flex items-center space-x-3">
             <ThemeToggle />
@@ -88,7 +94,7 @@ export default function Navbar() {
       {/* Mobile Menu */}
       {mobileMenuOpen && (
         <div className="md:hidden bg-gray-800 pb-3 space-y-1 sm:px-3 px-2 pt-2">
-          {navLinks.map((link) => (
+          {session && navLinks.map((link) => (
             <Link
               key={link.name}
               href={link.href}

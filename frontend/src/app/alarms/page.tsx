@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { getAlarms, createAlarm, toggleAlarm, deleteAlarm, AlarmTimer } from '@/lib/api';
+import { useSession } from '@/lib/auth-client';
 
 export default function AlarmsPage() {
+  const { data: session, isPending } = useSession();
   const [alarms, setAlarms] = useState<AlarmTimer[]>([]);
   const [loading, setLoading] = useState(true);
   const [newTime, setNewTime] = useState('09:30');
@@ -21,8 +23,10 @@ export default function AlarmsPage() {
   };
 
   useEffect(() => {
-    fetchAlarms();
-  }, []);
+    if (!isPending && session && (session.user as any).accountStatus !== 'pending') {
+      fetchAlarms();
+    }
+  }, [isPending, session]);
 
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,7 +62,29 @@ export default function AlarmsPage() {
     }
   };
 
-  if (loading) return <div className="text-gray-500 dark:text-gray-400">Loading alarms...</div>;
+  if (isPending) return <div className="text-gray-500 text-center py-10">Loading session...</div>;
+  if (!session) return null;
+
+  const user = session.user as any;
+  if (user.accountStatus === 'pending') {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
+        <div className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 max-w-lg">
+          <div className="w-16 h-16 bg-yellow-100 dark:bg-yellow-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
+            <svg className="w-8 h-8 text-yellow-600 dark:text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Alarms Locked</h2>
+          <p className="text-gray-600 dark:text-gray-400 mb-6">
+            You cannot set automated trading alarms until your account has been approved by an administrator.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (loading) return <div className="text-gray-500 dark:text-gray-400 text-center py-20 animate-pulse">Loading alarms...</div>;
 
   return (
     <div className="max-w-2xl mx-auto space-y-8">

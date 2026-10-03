@@ -31,8 +31,12 @@ export const requireAuth = async (req: Request, res: Response, next: NextFunctio
     const sessionData = await sessionRes.json();
     console.log('[requireAuth] Session validated via frontend:', sessionData ? 'success' : 'failed');
 
-    if (!sessionData || !sessionData.session) {
+    if (!sessionData || !sessionData.session || !sessionData.user) {
       return res.status(401).json({ error: 'Unauthorized: Invalid or expired session' });
+    }
+
+    if (sessionData.user.accountStatus === 'pending') {
+      return res.status(403).json({ error: 'Forbidden: Account is pending activation by an administrator.' });
     }
 
     // Attach user to request

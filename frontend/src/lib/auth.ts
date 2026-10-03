@@ -13,6 +13,20 @@ const resend = new Resend(process.env.RESEND_API_KEY || "re_mock_key");
 
 export const auth = betterAuth({
     database: mongodbAdapter(client.db()),
+    user: {
+        additionalFields: {
+            role: {
+                type: "string",
+                required: false,
+                defaultValue: "user"
+            },
+            accountStatus: {
+                type: "string",
+                required: false,
+                defaultValue: "pending"
+            }
+        }
+    },
     emailAndPassword: {
         enabled: true,
         autoSignIn: true,

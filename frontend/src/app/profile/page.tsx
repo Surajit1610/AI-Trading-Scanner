@@ -8,7 +8,7 @@ import StrategyEditor, { defaultTools } from './StrategyEditor';
 import { sendVerificationEmail } from '@/lib/auth-client';
 
 export default function ProfilePage() {
-  const { data: session } = useSession();
+  const { data: session, isPending } = useSession();
   const [profile, setProfile] = useState<UserProfileData | null>(null);
   const [assets, setAssets] = useState<Asset[]>([]);
   const [searchResults, setSearchResults] = useState<Asset[]>([]);
@@ -77,7 +77,26 @@ export default function ProfilePage() {
     setSendingVerification(false);
   };
 
-  if (!profile) return <div className="text-gray-500 dark:text-gray-400">Loading profile...</div>;
+  const user = session?.user as any;
+  if (user && user.accountStatus === 'pending') {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
+        <div className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 max-w-lg">
+          <div className="w-16 h-16 bg-yellow-100 dark:bg-yellow-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
+            <svg className="w-8 h-8 text-yellow-600 dark:text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Profile Locked</h2>
+          <p className="text-gray-600 dark:text-gray-400 mb-6">
+            Your profile settings and trading strategies are locked while your account is pending administrator approval.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!profile) return <div className="text-gray-500 dark:text-gray-400 text-center py-20 font-medium animate-pulse">Loading profile...</div>;
 
   const addTicker = (ticker: string) => {
     if (!profile.savedTickers.includes(ticker)) {
