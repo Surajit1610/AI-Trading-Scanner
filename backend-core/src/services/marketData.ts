@@ -21,9 +21,9 @@ export async function fetchQuote(ticker: string): Promise<QuoteData | null> {
     const sanitizedTicker = ticker.replace('/', '-').toUpperCase();
     const result = await yahooFinance.quote(sanitizedTicker);
     return {
-      marketCap: result.marketCap || 0,
-      volume: result.regularMarketVolume || 0,
-      changePct: result.regularMarketChangePercent || 0
+      marketCap: result?.marketCap || 0,
+      volume: result?.regularMarketVolume || 0,
+      changePct: result?.regularMarketChangePercent || 0
     };
   } catch (error) {
     console.error(`[MarketData] Failed to fetch quote for ${ticker}:`, error);
