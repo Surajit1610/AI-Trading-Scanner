@@ -29,7 +29,7 @@ export default function AdminDashboard() {
 
   const fetchUsers = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/admin/users', {
+      const res = await fetch('/api/v1/admin/users', {
         credentials: 'include'
       });
       if (res.ok) {
@@ -45,7 +45,7 @@ export default function AdminDashboard() {
 
   const updateUser = async (id: string, updates: any) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/admin/users/${id}`, {
+      const res = await fetch(`/api/v1/admin/users/${id}`, {
         method: 'PATCH',
         credentials: 'include',
         headers: {
