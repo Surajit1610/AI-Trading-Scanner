@@ -76,8 +76,10 @@ export const auth = betterAuth({
         }
     },
     advanced: {
-        crossSubDomainCookies: {
-            enabled: true
+        defaultCookieAttributes: {
+            domain: "aitrader.save-more.in",
+            secure: true,
+            sameSite: "none"
         }
     }
 });
