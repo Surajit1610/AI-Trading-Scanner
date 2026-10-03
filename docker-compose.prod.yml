@@ -48,6 +48,8 @@ services:
       - RESEND_API_KEY=${RESEND_API_KEY}
       - ONESIGNAL_APP_ID=${ONESIGNAL_APP_ID}
       - ONESIGNAL_REST_API_KEY=${ONESIGNAL_REST_API_KEY}
+      - EMAIL_FROM_ALERTS=${EMAIL_FROM_ALERTS}
+      - EMAIL_FROM_ONBOARDING=${EMAIL_FROM_ONBOARDING}
     ports:
       - "127.0.0.1:5000:5000" # Only accessible to local Nginx
     depends_on:
@@ -73,6 +75,7 @@ services:
       - MONGO_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
       - RESEND_API_KEY=${RESEND_API_KEY}
       - NEXT_PUBLIC_ONESIGNAL_APP_ID=${NEXT_PUBLIC_ONESIGNAL_APP_ID}
+      - EMAIL_FROM_ONBOARDING=${EMAIL_FROM_ONBOARDING}
     ports:
       - "127.0.0.1:3000:3000" # Only accessible to local Nginx
     depends_on:

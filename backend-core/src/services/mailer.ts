@@ -37,16 +37,16 @@ const getBrokerUrl = (broker: string, ticker: string) => {
   }
 
   // Indian Brokers (Deep linking where possible)
-  if (b === 'zerodha') return `https://kite.zerodha.com/chart/web/ciq/NSE/${symbol}`;
-  if (b === 'upstox') return `https://pro.upstox.com/stocks-trading/${symbol}`;
-  if (b === 'groww') return `https://groww.in/stocks/${symbol}`;
+  if (b === 'groww') return `https://groww.in/stocks/${symbol.toLowerCase()}`;
   
-  // Brokers without public deep-linking (redirect to main terminal)
+  // Brokers that block unauthenticated deep-linking (redirect to main terminal to prevent 'Key not found' errors)
+  if (b === 'zerodha') return `https://kite.zerodha.com/`;
+  if (b === 'upstox') return `https://pro.upstox.com/`;
+  if (b === 'angelone' || b === 'angel one') return `https://trade.angelone.in/`;
+  if (b === 'hdfc' || b === 'hdfc securities') return `https://ntrade.hdfcsec.com/`;
   if (b === 'shoonya') return `https://shoonya.finvasia.com/#/`;
-  if (b === 'angelone') return `https://trade.angelone.in/`;
   if (b === 'dhan') return `https://tv.dhan.co/`;
   if (b === 'fyers') return `https://trade.fyers.in/`;
-  if (b === 'sahi') return `https://www.sahi.com/`;
   
   // Default TradingView with correct Exchange prefixes
   if (isCrypto) {
