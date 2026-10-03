@@ -70,16 +70,5 @@ export const auth = betterAuth({
     },
     // Placeholders for future Google OAuth integration
     socialProviders: {
-        google: {
-            clientId: process.env.GOOGLE_CLIENT_ID || "",
-            clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
-        }
-    },
-    advanced: {
-        defaultCookieAttributes: {
-            domain: process.env.BETTER_AUTH_URL ? new URL(process.env.BETTER_AUTH_URL).hostname : undefined,
-            secure: true,
-            sameSite: "none"
-        }
     }
 });

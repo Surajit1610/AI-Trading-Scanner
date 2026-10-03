@@ -68,26 +68,26 @@ export interface AlertSignal {
 }
 
 export async function getAssets(): Promise<Asset[]> {
-  const res = await fetch(`${API_URL}/api/assets`, { next: { revalidate: 0 }, credentials: 'include' });
+  const res = await fetch(`${API_URL}/api/v1/assets`, { next: { revalidate: 0 }, credentials: 'include' });
   if (!res.ok) throw new Error('Failed to fetch assets');
   return res.json();
 }
 
 export async function searchAssetsAPI(query: string): Promise<Asset[]> {
   if (!query) return [];
-  const res = await fetch(`${API_URL}/api/assets/search?q=${encodeURIComponent(query)}`, { next: { revalidate: 0 }, credentials: 'include' });
+  const res = await fetch(`${API_URL}/api/v1/assets/search?q=${encodeURIComponent(query)}`, { next: { revalidate: 0 }, credentials: 'include' });
   if (!res.ok) throw new Error('Failed to search live assets');
   return res.json();
 }
 
 export async function getProfile(): Promise<UserProfileData> {
-  const res = await fetch(`${API_URL}/api/profile`, { next: { revalidate: 0 }, credentials: 'include' });
+  const res = await fetch(`${API_URL}/api/v1/profile`, { next: { revalidate: 0 }, credentials: 'include' });
   if (!res.ok) throw new Error('Failed to fetch profile');
   return res.json();
 }
 
 export async function updateProfile(data: Partial<UserProfileData>): Promise<UserProfileData> {
-  const res = await fetch(`${API_URL}/api/profile`, {
+  const res = await fetch(`${API_URL}/api/v1/profile`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
@@ -98,7 +98,7 @@ export async function updateProfile(data: Partial<UserProfileData>): Promise<Use
 }
 
 export async function triggerImmediateScan(): Promise<any> {
-  const res = await fetch(`${API_URL}/api/scan/trigger`, {
+  const res = await fetch(`${API_URL}/api/v1/scan/trigger`, {
     method: 'POST',
     credentials: 'include'
   });
@@ -107,13 +107,13 @@ export async function triggerImmediateScan(): Promise<any> {
 }
 
 export async function getAlarms(): Promise<AlarmTimer[]> {
-  const res = await fetch(`${API_URL}/api/alarms`, { next: { revalidate: 0 }, credentials: 'include' });
+  const res = await fetch(`${API_URL}/api/v1/alarms`, { next: { revalidate: 0 }, credentials: 'include' });
   if (!res.ok) throw new Error('Failed to fetch alarms');
   return res.json();
 }
 
 export async function createAlarm(time: string): Promise<AlarmTimer> {
-  const res = await fetch(`${API_URL}/api/alarms`, {
+  const res = await fetch(`${API_URL}/api/v1/alarms`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ time }),
@@ -124,7 +124,7 @@ export async function createAlarm(time: string): Promise<AlarmTimer> {
 }
 
 export async function toggleAlarm(id: string, isActive: boolean): Promise<AlarmTimer> {
-  const res = await fetch(`${API_URL}/api/alarms/${id}`, {
+  const res = await fetch(`${API_URL}/api/v1/alarms/${id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ isActive }),
@@ -135,7 +135,7 @@ export async function toggleAlarm(id: string, isActive: boolean): Promise<AlarmT
 }
 
 export async function deleteAlarm(id: string): Promise<void> {
-  const res = await fetch(`${API_URL}/api/alarms/${id}`, {
+  const res = await fetch(`${API_URL}/api/v1/alarms/${id}`, {
     method: 'DELETE',
     credentials: 'include'
   });
@@ -143,7 +143,7 @@ export async function deleteAlarm(id: string): Promise<void> {
 }
 
 export async function getSignals(level?: 'math_pass' | 'ai_alert'): Promise<AlertSignal[]> {
-  const url = level ? `${API_URL}/api/signals?level=${level}` : `${API_URL}/api/signals`;
+  const url = level ? `${API_URL}/api/v1/signals?level=${level}` : `${API_URL}/api/v1/signals`;
   const res = await fetch(url, { next: { revalidate: 0 }, credentials: 'include' });
   if (!res.ok) throw new Error('Failed to fetch signals');
   return res.json();

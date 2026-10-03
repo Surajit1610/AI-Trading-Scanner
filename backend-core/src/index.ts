@@ -32,11 +32,11 @@ app.use(express.json());
 app.use(cookieParser());
 
 // Routes
-app.use('/api', profileRoutes);
-app.use('/api', alarmRoutes);
-app.use('/api', signalRoutes);
-app.use('/api', assetRoutes);
-app.use('/api', adminRoutes);
+app.use('/api/v1', profileRoutes);
+app.use('/api/v1', alarmRoutes);
+app.use('/api/v1', signalRoutes);
+app.use('/api/v1', assetRoutes);
+app.use('/api/v1', adminRoutes);
 
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok', service: 'backend-core' });
