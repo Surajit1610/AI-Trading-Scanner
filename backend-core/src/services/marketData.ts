@@ -69,7 +69,7 @@ export async function fetchCandles(ticker: string, timeframe: string, limit: num
     // Map our timeframe strings to Yahoo Finance intervals
     type YFInterval = "1m"|"2m"|"5m"|"15m"|"30m"|"60m"|"90m"|"1h"|"1d"|"5d"|"1wk"|"1mo"|"3mo";
     const intervalMap: Record<string, YFInterval> = {
-      '1m': '1m', '5m': '5m', '15m': '15m', '30m': '30m',
+      '1m': '1m', '2m': '2m', '5m': '5m', '15m': '15m', '30m': '30m',
       '1h': '60m', '4h': '60m', // Yahoo doesn't support 4h natively; we fetch 60m and get enough candles
       '1d': '1d', '1wk': '1wk', '1mo': '1mo'
     };
@@ -80,6 +80,7 @@ export async function fetchCandles(ticker: string, timeframe: string, limit: num
     let msLookback: number;
     switch (interval) {
       case '1m':  msLookback = 1  * 60 * 1000 * limit * 4; break;   // 4x buffer for market gaps
+      case '2m':  msLookback = 2  * 60 * 1000 * limit * 4; break;
       case '5m':  msLookback = 5  * 60 * 1000 * limit * 3; break;
       case '15m': msLookback = 15 * 60 * 1000 * limit * 3; break;
       case '30m': msLookback = 30 * 60 * 1000 * limit * 3; break;

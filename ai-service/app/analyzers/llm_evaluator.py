@@ -53,8 +53,8 @@ def evaluate_with_llm(
 
     # Timeframe-aware context so the AI evaluates appropriately for each trading style
     tf_lower = timeframe.lower()
-    if tf_lower in ['1m', '5m']:
-        trading_style = "MICRO SCALPING (1m/5m)"
+    if tf_lower in ['1m', '2m', '5m']:
+        trading_style = "MICRO SCALPING (1m/2m/5m)"
         style_context = """
 SCALPING EVALUATION RULES:
 - The primary concern is MOMENTUM and IMMEDIATE price direction in the next 5-30 minutes.

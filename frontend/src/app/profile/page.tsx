@@ -233,6 +233,7 @@ export default function ProfilePage() {
                 >
                   <optgroup label="Scalping">
                     <option value="1m">1m — Micro Scalp</option>
+                    <option value="2m">2m — Ultra Scalp</option>
                     <option value="5m">5m — Scalping</option>
                   </optgroup>
                   <optgroup label="Intraday">
